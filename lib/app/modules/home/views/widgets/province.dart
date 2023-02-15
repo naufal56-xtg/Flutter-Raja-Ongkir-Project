@@ -77,13 +77,14 @@ class Provinsi extends GetView<HomeController> {
               controller.isHideProvTo.value = false;
               controller.provIdTo.value = int.parse(prov.provinceId.toString());
             }
-            controller.showButton();
           } else {
             if (type == 'asal') {
-              controller.isHideProv.value = true;
+              // controller.isHideProv.value = true;
+              controller.isHideButton.value = true;
               controller.provId.value = 0;
             } else {
-              controller.isHideProvTo.value = true;
+              // controller.isHideProvTo.value = true;
+              controller.isHideButton.value = true;
               controller.provIdTo.value = 0;
             }
           }

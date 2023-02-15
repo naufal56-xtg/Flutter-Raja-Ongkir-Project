@@ -28,14 +28,27 @@ class Weight extends GetView<HomeController> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
-              onChanged: (value) => controller.changeWeight(value),
+              onChanged: (value) {
+                if (value != '' || value != '0.0') {
+                  controller.changeWeight(value);
+                  controller.isCourer.value = false;
+                  controller.isHideButton.value = true;
+                }
+                if (value == '' || value == '0') {
+                  controller.isHideButton.value = true;
+                  controller.isCourer.value = true;
+                  controller.service.value = "";
+                  controller.costs.value = "";
+                  controller.days.value = "";
+                }
+              },
             ),
           ),
           SizedBox(
             width: 10,
           ),
           Container(
-            width: 100,
+            width: 110,
             child: DropdownSearch<String>(
               popupProps: PopupProps.bottomSheet(
                 showSelectedItems: true,

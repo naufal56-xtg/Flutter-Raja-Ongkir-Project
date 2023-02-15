@@ -79,23 +79,23 @@ class Kota extends GetView<HomeController> {
           if (city != null) {
             if (type == 'asal') {
               controller.cityId.value = int.parse(city.cityId.toString());
+              controller.isHide.value = false;
             } else {
               controller.cityIdTo.value = int.parse(city.cityId.toString());
+              controller.isHideProvTo.value = false;
+              controller.isWeight.value = false;
             }
-            controller.showButton();
           } else {
             if (type == 'asal') {
+              // controller.isHide.value = true;
+              controller.isHideButton.value = true;
               controller.cityId.value = 0;
             } else {
+              // controller.isWeight.value = true;
+              controller.isHideButton.value = true;
               controller.cityIdTo.value = 0;
             }
           }
-
-          // if (city != null) {
-          //   city.cityName;
-          // } else {
-          //   print('Tidak Ada Data Yang Dipilih');
-          // }
         },
         itemAsString: (item) => "${item.type} ${item.cityName}",
       ),

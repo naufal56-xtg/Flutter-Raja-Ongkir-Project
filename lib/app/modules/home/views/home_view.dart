@@ -17,11 +17,9 @@ class HomeView extends GetView<HomeController> {
         title: const Text('Ongkos Kirim Raja Ongkir'),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
+      body: SafeArea(
         child: ListView(
-          shrinkWrap: true,
-          physics: ScrollPhysics(),
+          padding: const EdgeInsets.all(20.0),
           children: [
             Provinsi(
               type: 'asal',
@@ -34,8 +32,12 @@ class HomeView extends GetView<HomeController> {
                       type: 'asal',
                     ),
             ),
-            Provinsi(
-              type: 'tujuan',
+            Obx(
+              () => controller.isHide.isTrue
+                  ? SizedBox()
+                  : Provinsi(
+                      type: 'tujuan',
+                    ),
             ),
             Obx(
               () => controller.isHideProvTo.isTrue
@@ -45,49 +47,122 @@ class HomeView extends GetView<HomeController> {
                       type: 'tujuan',
                     ),
             ),
-            Weight(),
-            Padding(
-              padding: const EdgeInsets.only(top: 10, bottom: 30),
-              child: DropdownSearch<Map<String, dynamic>>(
-                clearButtonProps: ClearButtonProps(isVisible: true),
-                popupProps: PopupProps.menu(
-                  itemBuilder: (context, item, isSelected) {
-                    return Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      child: Text(
-                        '${item['name']}',
-                        style: TextStyle(
-                          fontSize: 18.0,
+            Obx(
+              () => controller.isWeight.isTrue ? SizedBox() : Weight(),
+            ),
+            Obx(
+              () => controller.isCourer.isTrue
+                  ? SizedBox()
+                  : Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: DropdownSearch<Map<String, dynamic>>(
+                        clearButtonProps: ClearButtonProps(isVisible: true),
+                        popupProps: PopupProps.menu(
+                          itemBuilder: (context, item, isSelected) {
+                            return Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Text(
+                                '${item['name']}',
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                            );
+                          },
                         ),
+                        items: [
+                          {
+                            'code': 'jne',
+                            'name': 'Jalur Nugraha Ekakurir (JNE)'
+                          },
+                          {'code': 'tiki', 'name': 'Titipan Kilat (Tiki)'},
+                          {'code': 'pos', 'name': 'POS Indonesia'},
+                        ],
+                        dropdownDecoratorProps: DropDownDecoratorProps(
+                          dropdownSearchDecoration: InputDecoration(
+                            labelText: "Kurir / Ekspedisi",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          if (value != null) {
+                            controller.courier.value = value['code'];
+                            controller.showButton();
+                          } else {
+                            controller.isHideButton.value = true;
+                            controller.courier.value = "";
+                            controller.service.value = "";
+                            controller.costs.value = "";
+                            controller.days.value = "";
+                          }
+                        },
+                        itemAsString: (item) => '${item['name']}',
                       ),
-                    );
-                  },
-                ),
-                items: [
-                  {'code': 'jne', 'name': 'Jalur Nugraha Ekakurir (JNE)'},
-                  {'code': 'tiki', 'name': 'Titipan Kilat (Tiki)'},
-                  {'code': 'pos', 'name': 'POS Indonesia'},
-                ],
-                dropdownDecoratorProps: DropDownDecoratorProps(
-                  dropdownSearchDecoration: InputDecoration(
-                    labelText: "Kurir / Ekspedisi",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                  ),
-                ),
-                onChanged: (value) {
-                  if (value != null) {
-                    controller.courier.value = value['code'];
-                    controller.showButton();
-                  } else {
-                    controller.isHideButton.value = true;
-                    controller.courier.value = "";
-                  }
-                },
-                itemAsString: (item) => '${item['name']}',
-              ),
+            ),
+            Obx(
+              () => controller.isOngkir.isTrue
+                  ? SizedBox()
+                  : Padding(
+                      padding: const EdgeInsets.only(top: 20, bottom: 30),
+                      child: Column(
+                        children: [
+                          Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Nama Layanan',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text('${controller.service}'),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Harga Ongkir',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text('Rp. ${controller.costs}'),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Estimasi',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(controller.code.value == 'pos'
+                                    ? '${controller.days}'
+                                    : '${controller.days} Hari'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
             ),
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -95,7 +170,7 @@ class HomeView extends GetView<HomeController> {
                 () => controller.isHideButton.isTrue
                     ? SizedBox()
                     : ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () => controller.cekOngkir(),
                         child: Text('Cek Ongkir'),
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 20),
